@@ -309,7 +309,7 @@ dotnet test clawapp.Tests/clawapp.Tests.csproj
 
 ## License
 
-[Your License Here]
+MIT
 
 ---
 
