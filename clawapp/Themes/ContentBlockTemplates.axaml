@@ -1,0 +1,66 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:models="using:clawapp.Models"
+                    xmlns:controls="using:clawapp.Controls"
+                    xmlns:selectors="using:clawapp.Selectors"
+                    xmlns:vm="using:clawapp.ViewModels"
+                    xmlns:conv="using:clawapp.Converters">
+    
+    <!-- Text Block Template -->
+    <DataTemplate x:Key="TextBlockTemplate" DataType="models:ContentBlock">
+        <TextBlock Text="{Binding Text}" 
+                   TextWrapping="Wrap" 
+                   IsVisible="{Binding Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    </DataTemplate>
+    
+    <!-- Thinking Block Template -->
+    <DataTemplate x:Key="ThinkingBlockTemplate" DataType="models:ContentBlock">
+        <controls:ThinkingBlockView ThinkingText="{Binding Thinking}"
+                                     IsStreaming="{Binding Thinking, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                                     IsVisible="{Binding Source={x:Static vm:SettingsProvider.Instance}, Path=ShowThinkingBlocks}" />
+    </DataTemplate>
+    
+    <!-- Tool Call Template -->
+    <DataTemplate x:Key="ToolCallTemplate" DataType="models:ContentBlock">
+        <controls:ToolCallView ToolId="{Binding Id}"
+                               ToolName="{Binding Name}"
+                               Arguments="{Binding Arguments}"
+                               Status="Pending"
+                               IsVisible="{Binding Source={x:Static vm:SettingsProvider.Instance}, Path=ShowToolCalls}"
+                               ShowToolResults="{Binding Source={x:Static vm:SettingsProvider.Instance}, Path=ShowToolResults}" />
+    </DataTemplate>
+    
+    <!-- File Attachment Template -->
+    <DataTemplate x:Key="FileBlockTemplate" DataType="models:ContentBlock">
+        <controls:FileAttachmentView FileName="{Binding FileName}"
+                                      MimeType="{Binding MimeType}"
+                                      ContentData="{Binding Content}"
+                                      IsVisible="{Binding FileName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    </DataTemplate>
+    
+    <!-- Audio Message Template -->
+    <DataTemplate x:Key="AudioBlockTemplate" DataType="models:ContentBlock">
+        <controls:AudioMessageView AudioId="{Binding Id}"
+                                   MimeType="{Binding MimeType}"
+                                   AudioData="{Binding Content}"
+                                   Transcript="{Binding Transcript}"
+                                   Duration="{Binding Duration, Converter={x:Static conv:SecondsToTimeSpanConverter.Instance}}" />
+    </DataTemplate>
+    
+    <!-- Unknown/Fallback Template -->
+    <DataTemplate x:Key="UnknownBlockTemplate" DataType="models:ContentBlock">
+        <TextBlock Text="{Binding Type, StringFormat='[Unsupported content: {0}]'}"
+                   Opacity="0.6"
+                   FontStyle="Italic"
+                   IsVisible="{Binding Type, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    </DataTemplate>
+    
+    <!-- DataTemplateSelector -->
+    <selectors:ContentBlockDataTemplateSelector x:Key="ContentBlockTemplateSelector"
+                                                  TextTemplate="{StaticResource TextBlockTemplate}"
+                                                  ThinkingTemplate="{StaticResource ThinkingBlockTemplate}"
+                                                  ToolCallTemplate="{StaticResource ToolCallTemplate}"
+                                                  FileTemplate="{StaticResource FileBlockTemplate}"
+                                                  AudioTemplate="{StaticResource AudioBlockTemplate}"
+                                                  UnknownTemplate="{StaticResource UnknownBlockTemplate}" />
+</ResourceDictionary>

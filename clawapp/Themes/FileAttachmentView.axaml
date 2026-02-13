@@ -1,0 +1,80 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:clawapp.Controls">
+    <ControlTheme x:Key="{x:Type controls:FileAttachmentView}" TargetType="controls:FileAttachmentView">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="10"
+                        MaxWidth="300">
+                    <StackPanel Spacing="8">
+                        <!-- Image preview (shown only for images) -->
+                        <Border x:Name="PART_ImagePreviewBorder"
+                                IsVisible="False"
+                                CornerRadius="4"
+                                ClipToBounds="True"
+                                MaxHeight="200">
+                            <Image Source="{TemplateBinding ImagePreview}"
+                                   Stretch="Uniform"
+                                   StretchDirection="DownOnly"/>
+                        </Border>
+                        
+                        <!-- File info row -->
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <!-- File icon -->
+                            <TextBlock Grid.Column="0"
+                                       Text="{TemplateBinding FileIcon}"
+                                       FontSize="24"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0"/>
+                            
+                            <!-- File name and size -->
+                            <StackPanel Grid.Column="1" 
+                                        VerticalAlignment="Center"
+                                        Spacing="2">
+                                <TextBlock Text="{TemplateBinding FileName}"
+                                           FontWeight="SemiBold"
+                                           TextTrimming="CharacterEllipsis"
+                                           ToolTip.Tip="{TemplateBinding FileName}"/>
+                                <TextBlock Text="{TemplateBinding FileSizeDisplay}"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           IsVisible="{TemplateBinding FileSizeDisplay, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                            </StackPanel>
+                            
+                            <!-- Download button -->
+                            <Button x:Name="PART_DownloadButton"
+                                    Grid.Column="2"
+                                    Content="⬇️"
+                                    ToolTip.Tip="Download"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="8"
+                                    VerticalAlignment="Center"
+                                    Cursor="Hand"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        
+        <!-- Show image preview when IsImage is true -->
+        <Style Selector="^[IsImage=True]">
+            <Style Selector="^ /template/ Border#PART_ImagePreviewBorder">
+                <Setter Property="IsVisible" Value="True"/>
+            </Style>
+        </Style>
+        
+        <!-- Hover effect -->
+        <Style Selector="^:pointerover">
+            <Style Selector="^ /template/ Border">
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+            </Style>
+        </Style>
+    </ControlTheme>
+</ResourceDictionary>

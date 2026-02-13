@@ -1,0 +1,184 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:clawapp.ViewModels"
+             xmlns:conv="using:clawapp.Converters"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
+             x:Class="clawapp.Views.MessageDetailView"
+             x:DataType="vm:MessageDetailViewModel">
+
+  <!-- Fullscreen overlay background -->
+  <Panel Background="#CC000000">
+    <!-- Centered dialog card -->
+    <Border Background="{DynamicResource SurfaceBrush}"
+            CornerRadius="8"
+            MaxWidth="600"
+            MaxHeight="700"
+            MinHeight="400"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Center"
+            Margin="16"
+            BoxShadow="0 8 32 0 rgba(0,0,0,0.4)">
+      
+      <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Title Bar -->
+        <Border Grid.Row="0"
+                BorderThickness="0,0,0,1"
+                BorderBrush="{DynamicResource BorderBrush}"
+                Padding="16"
+                Background="{DynamicResource SurfaceBrush}">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Grid.Column="0"
+                       Text="{CompiledBinding Title}"
+                       Classes="h3"
+                       VerticalAlignment="Center"/>
+            <Button Grid.Column="1"
+                    Content="✕"
+                    Click="CloseButton_Click"
+                    Classes="icon secondary"
+                    ToolTip.Tip="Close"/>
+          </Grid>
+        </Border>
+
+        <!-- Content Area with Tabs -->
+        <TabControl Grid.Row="1"
+                    SelectedIndex="{CompiledBinding SelectedTabIndex}"
+                    Margin="0">
+          
+          <!-- Text Tab -->
+          <TabItem Header="Text">
+            <Grid RowDefinitions="*,Auto">
+              <ScrollViewer Grid.Row="0"
+                            HorizontalScrollBarVisibility="{CompiledBinding IsWordWrapEnabled, Converter={x:Static conv:BoolToScrollBarVisibilityConverter.Instance}}"
+                            VerticalScrollBarVisibility="Auto">
+                <TextBlock Text="{CompiledBinding TextContent}"
+                           TextWrapping="{CompiledBinding IsWordWrapEnabled, Converter={x:Static conv:BoolToTextWrappingConverter.Instance}}"
+                           FontFamily="Consolas,Monaco,Courier New,monospace"
+                           FontSize="13"
+                           Margin="16"
+                           Padding="0,0,0,16"/>
+              </ScrollViewer>
+              
+              <Border Grid.Row="1"
+                      BorderThickness="0,1,0,0"
+                      BorderBrush="{DynamicResource BorderBrush}"
+                      Padding="12,8"
+                      Background="{DynamicResource SurfaceBrush}">
+                <Grid ColumnDefinitions="Auto,*">
+                  <ToggleSwitch Grid.Column="0"
+                                Content="Wrap"
+                                IsChecked="{CompiledBinding IsWordWrapEnabled}"
+                                VerticalAlignment="Center"/>
+                  <Button Grid.Column="1"
+                          Content="Copy Text"
+                          Click="CopyTextButton_Click"
+                          Classes="secondary"
+                          HorizontalAlignment="Right"/>
+                </Grid>
+              </Border>
+            </Grid>
+          </TabItem>
+
+          <!-- Thinking Tab (visible only if thinking content exists) -->
+          <TabItem Header="Thinking"
+                   IsVisible="{CompiledBinding HasThinking}">
+            <Grid RowDefinitions="*,Auto">
+              <ScrollViewer Grid.Row="0"
+                            HorizontalScrollBarVisibility="{CompiledBinding IsWordWrapEnabled, Converter={x:Static conv:BoolToScrollBarVisibilityConverter.Instance}}"
+                            VerticalScrollBarVisibility="Auto">
+                <TextBlock Text="{CompiledBinding ThinkingContent}"
+                           TextWrapping="{CompiledBinding IsWordWrapEnabled, Converter={x:Static conv:BoolToTextWrappingConverter.Instance}}"
+                           FontFamily="Consolas,Monaco,Courier New,monospace"
+                           FontSize="13"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           Margin="16"
+                           Padding="0,0,0,16"/>
+              </ScrollViewer>
+              
+              <Border Grid.Row="1"
+                      BorderThickness="0,1,0,0"
+                      BorderBrush="{DynamicResource BorderBrush}"
+                      Padding="12,8"
+                      Background="{DynamicResource SurfaceBrush}">
+                <Button Content="Copy Thinking"
+                        Click="CopyThinkingButton_Click"
+                        Classes="secondary"
+                        HorizontalAlignment="Right"/>
+              </Border>
+            </Grid>
+          </TabItem>
+
+          <!-- Tool Calls Tab (visible only if tool calls exist) -->
+          <TabItem Header="Tool Calls"
+                   IsVisible="{CompiledBinding HasToolCalls}">
+            <Grid RowDefinitions="*,Auto">
+              <ScrollViewer Grid.Row="0"
+                            HorizontalScrollBarVisibility="{CompiledBinding IsWordWrapEnabled, Converter={x:Static conv:BoolToScrollBarVisibilityConverter.Instance}}"
+                            VerticalScrollBarVisibility="Auto">
+                <TextBlock Text="{CompiledBinding ToolCallsContent}"
+                           TextWrapping="{CompiledBinding IsWordWrapEnabled, Converter={x:Static conv:BoolToTextWrappingConverter.Instance}}"
+                           FontFamily="Consolas,Monaco,Courier New,monospace"
+                           FontSize="13"
+                           Margin="16"
+                           Padding="0,0,0,16"/>
+              </ScrollViewer>
+              
+              <Border Grid.Row="1"
+                      BorderThickness="0,1,0,0"
+                      BorderBrush="{DynamicResource BorderBrush}"
+                      Padding="12,8"
+                      Background="{DynamicResource SurfaceBrush}">
+                <Button Content="Copy Tool Calls"
+                        Click="CopyToolCallsButton_Click"
+                        Classes="secondary"
+                        HorizontalAlignment="Right"/>
+              </Border>
+            </Grid>
+          </TabItem>
+
+          <!-- Metadata Tab -->
+          <TabItem Header="Metadata">
+            <Grid RowDefinitions="*,Auto">
+              <ScrollViewer Grid.Row="0"
+                            HorizontalScrollBarVisibility="{CompiledBinding IsWordWrapEnabled, Converter={x:Static conv:BoolToScrollBarVisibilityConverter.Instance}}"
+                            VerticalScrollBarVisibility="Auto">
+                <TextBlock Text="{CompiledBinding MetadataContent}"
+                           TextWrapping="{CompiledBinding IsWordWrapEnabled, Converter={x:Static conv:BoolToTextWrappingConverter.Instance}}"
+                           FontFamily="Consolas,Monaco,Courier New,monospace"
+                           FontSize="13"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           Margin="16"
+                           Padding="0,0,0,16"/>
+              </ScrollViewer>
+              
+              <Border Grid.Row="1"
+                      BorderThickness="0,1,0,0"
+                      BorderBrush="{DynamicResource BorderBrush}"
+                      Padding="12,8"
+                      Background="{DynamicResource SurfaceBrush}">
+                <Button Content="Copy Metadata"
+                        Click="CopyMetadataButton_Click"
+                        Classes="secondary"
+                        HorizontalAlignment="Right"/>
+              </Border>
+            </Grid>
+          </TabItem>
+        </TabControl>
+
+        <!-- Bottom Action Bar -->
+        <Border Grid.Row="2"
+                BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource BorderBrush}"
+                Padding="16"
+                Background="{DynamicResource SurfaceBrush}">
+          <Button Content="Close"
+                  Click="CloseButton_Click"
+                  Classes="primary"
+                  HorizontalAlignment="Right"
+                  MinWidth="100"/>
+        </Border>
+      </Grid>
+    </Border>
+  </Panel>
+</UserControl>

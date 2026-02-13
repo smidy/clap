@@ -1,0 +1,136 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:clawapp.Controls">
+    <ControlTheme x:Key="{x:Type controls:AudioMessageView}" TargetType="controls:AudioMessageView">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="10"
+                        MinWidth="200"
+                        MaxWidth="300">
+                    <StackPanel Spacing="8">
+                        <!-- Player row -->
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <!-- Play/Pause button -->
+                            <Button x:Name="PART_PlayPauseButton"
+                                    Grid.Column="0"
+                                    Background="{DynamicResource AccentBrush}"
+                                    Foreground="White"
+                                    Width="36"
+                                    Height="36"
+                                    CornerRadius="18"
+                                    Padding="0"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Cursor="Hand">
+                                <TextBlock Text="{TemplateBinding PlayPauseIcon}"
+                                           FontSize="14"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Button>
+                            
+                            <!-- Progress area -->
+                            <StackPanel Grid.Column="1" 
+                                        Margin="10,0"
+                                        VerticalAlignment="Center"
+                                        Spacing="2">
+                                <!-- Waveform placeholder / Progress slider -->
+                                <Slider x:Name="PART_ProgressSlider"
+                                        Minimum="0"
+                                        Maximum="100"
+                                        Value="{TemplateBinding ProgressPercent, Mode=OneWay}"
+                                        Height="20"
+                                        Cursor="Hand"/>
+                                
+                                <!-- Time display -->
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{TemplateBinding CurrentPositionDisplay}"
+                                               FontSize="10"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    <TextBlock Grid.Column="2"
+                                               Text="{TemplateBinding DurationDisplay}"
+                                               FontSize="10"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                </Grid>
+                            </StackPanel>
+                            
+                            <!-- Audio icon -->
+                            <TextBlock Grid.Column="2"
+                                       Text="🎤"
+                                       FontSize="18"
+                                       VerticalAlignment="Center"
+                                       Opacity="0.6"/>
+                        </Grid>
+                        
+                        <!-- Transcript toggle (shown when transcript is available) -->
+                        <Button x:Name="PART_TranscriptToggleButton"
+                                IsVisible="False"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                Cursor="Hand">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock x:Name="PART_TranscriptChevron"
+                                           Text="▶"
+                                           FontSize="10"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Show transcript"
+                                           FontSize="11"
+                                           FontStyle="Italic"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </Button>
+                        
+                        <!-- Transcript content -->
+                        <Border x:Name="PART_TranscriptBorder"
+                                IsVisible="False"
+                                Background="{DynamicResource AppBackgroundBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="8">
+                            <SelectableTextBlock Text="{TemplateBinding Transcript}"
+                                                 FontSize="12"
+                                                 FontStyle="Italic"
+                                                 TextWrapping="Wrap"
+                                                 Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        
+        <!-- Show transcript content when ShowTranscript is true -->
+        <Style Selector="^[ShowTranscript=True]">
+            <Style Selector="^ /template/ Border#PART_TranscriptBorder">
+                <Setter Property="IsVisible" Value="True"/>
+            </Style>
+            <Style Selector="^ /template/ TextBlock#PART_TranscriptChevron">
+                <Setter Property="Text" Value="▼"/>
+            </Style>
+        </Style>
+        
+        <!-- Loading state -->
+        <Style Selector="^[PlaybackState=Loading]">
+            <Style Selector="^ /template/ Button#PART_PlayPauseButton">
+                <Setter Property="IsEnabled" Value="False"/>
+                <Setter Property="Opacity" Value="0.6"/>
+            </Style>
+        </Style>
+        
+        <!-- Playing state - accent glow effect -->
+        <Style Selector="^[PlaybackState=Playing]">
+            <Style Selector="^ /template/ Button#PART_PlayPauseButton">
+                <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+            </Style>
+        </Style>
+    </ControlTheme>
+</ResourceDictionary>

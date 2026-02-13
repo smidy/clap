@@ -1,0 +1,138 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:clawapp.Controls">
+    <ControlTheme x:Key="{x:Type controls:ToolCallView}" TargetType="controls:ToolCallView">
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="10">
+                    <StackPanel Spacing="6">
+                        <!-- Header with icon, name, and expand toggle -->
+                        <Button x:Name="PART_ToggleButton"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="0"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
+                                Cursor="Hand">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                <!-- Tool icon -->
+                                <TextBlock Grid.Column="0"
+                                           Text="{TemplateBinding ToolIcon}"
+                                           FontSize="16"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0"/>
+                                <!-- Tool name -->
+                                <TextBlock Grid.Column="1"
+                                           Text="{TemplateBinding ToolName}"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <!-- Status indicator -->
+                                <TextBlock x:Name="PART_StatusIcon"
+                                           Grid.Column="2"
+                                           Text="⏳"
+                                           FontSize="12"
+                                           VerticalAlignment="Center"
+                                           Margin="8,0"/>
+                                <!-- Expand chevron -->
+                                <TextBlock x:Name="PART_Chevron"
+                                           Grid.Column="3"
+                                           Text="▶"
+                                           FontSize="10"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+                        </Button>
+                        
+                        <!-- Arguments section (collapsed by default) -->
+                        <Border x:Name="PART_ArgumentsBorder"
+                                IsVisible="False"
+                                Background="{DynamicResource AppBackgroundBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="8"
+                                Margin="0,4,0,0">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Arguments"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <SelectableTextBlock Text="{TemplateBinding FormattedArguments}"
+                                                     FontFamily="Consolas, Menlo, Monaco, monospace"
+                                                     FontSize="11"
+                                                     TextWrapping="Wrap"
+                                                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- Result section (shown when result is available) -->
+                        <Border x:Name="PART_ResultBorder"
+                                IsVisible="False"
+                                Background="{DynamicResource AppBackgroundBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="8"
+                                Margin="0,4,0,0">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Result"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <SelectableTextBlock Text="{TemplateBinding Result}"
+                                                     FontFamily="Consolas, Menlo, Monaco, monospace"
+                                                     FontSize="11"
+                                                     TextWrapping="Wrap"
+                                                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        
+        <!-- Expanded state -->
+        <Style Selector="^[IsExpanded=True]">
+            <Style Selector="^ /template/ TextBlock#PART_Chevron">
+                <Setter Property="Text" Value="▼"/>
+            </Style>
+            <Style Selector="^ /template/ Border#PART_ArgumentsBorder">
+                <Setter Property="IsVisible" Value="True"/>
+            </Style>
+        </Style>
+        
+        <!-- Status: Success -->
+        <Style Selector="^[Status=Success]">
+            <Style Selector="^ /template/ TextBlock#PART_StatusIcon">
+                <Setter Property="Text" Value="✓"/>
+                <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+            </Style>
+        </Style>
+        
+        <!-- Status: Error -->
+        <Style Selector="^[Status=Error]">
+            <Style Selector="^ /template/ TextBlock#PART_StatusIcon">
+                <Setter Property="Text" Value="✗"/>
+                <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}"/>
+            </Style>
+            <Style Selector="^ /template/ Border">
+                <Setter Property="BorderBrush" Value="{DynamicResource ErrorBrush}"/>
+            </Style>
+        </Style>
+        
+        <!-- Status: Pending -->
+        <Style Selector="^[Status=Pending]">
+            <Style Selector="^ /template/ TextBlock#PART_StatusIcon">
+                <Setter Property="Text" Value="⏳"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            </Style>
+        </Style>
+    </ControlTheme>
+</ResourceDictionary>

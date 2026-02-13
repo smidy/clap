@@ -1,0 +1,33 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:clawapp"
+             x:Class="clawapp.App"
+             RequestedThemeVariant="Default">
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <MergeResourceInclude Source="/Themes/Colors.axaml"/>
+                <MergeResourceInclude Source="/Themes/Spacing.axaml"/>
+                <MergeResourceInclude Source="/Themes/ChatBubble.axaml"/>
+                <MergeResourceInclude Source="/Themes/SessionCard.axaml"/>
+                <MergeResourceInclude Source="/Themes/ThinkingBlockView.axaml"/>
+                <MergeResourceInclude Source="/Themes/ToolCallView.axaml"/>
+                <MergeResourceInclude Source="/Themes/FileAttachmentView.axaml"/>
+                <MergeResourceInclude Source="/Themes/AudioMessageView.axaml"/>
+                <MergeResourceInclude Source="/Themes/AudioRecorderButton.axaml"/>
+                <MergeResourceInclude Source="/Themes/ContentBlockTemplates.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="/Themes/Typography.axaml"/>
+        <StyleInclude Source="/Themes/ControlStyles.axaml"/>
+    </Application.Styles>
+</Application>

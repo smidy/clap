@@ -1,0 +1,305 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:clawapp.ViewModels"
+             xmlns:models="using:clawapp.Models"
+             xmlns:services="using:clawapp.Services"
+             xmlns:conv="using:clawapp.Converters"
+             xmlns:controls="using:clawapp.Controls"
+             xmlns:views="using:clawapp.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+             x:Class="clawapp.Views.ChatView"
+             x:DataType="vm:ChatViewModel">
+  <UserControl.Styles>
+    <!-- Prevent ListBoxItem from auto-scrolling on tap (fixes recentering issue) -->
+    <Style Selector="ListBox#MessagesListBox ListBoxItem">
+      <Setter Property="Focusable" Value="False"/>
+    </Style>
+  </UserControl.Styles>
+  
+  <!-- Root Grid with main content + overlay -->
+  <Grid>
+    <!-- Main Chat Content -->
+    <Grid RowDefinitions="Auto,*,Auto" x:Name="MainContentGrid">
+    <!-- Header Bar: [Menu Button] [Session Dropdown] [Connection State] -->
+    <Border Grid.Row="0"
+            Padding="12,8"
+            BorderThickness="0,0,0,1"
+            BorderBrush="{DynamicResource BorderBrush}"
+            Background="{DynamicResource SurfaceBrush}">
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+        <!-- Left Menu Button (sandwich) with Flyout containing Settings -->
+        <Button Grid.Column="0"
+                Content="☰"
+                Classes="secondary icon"
+                Margin="0,0,12,0">
+          <Button.Flyout>
+            <Flyout Placement="BottomEdgeAlignedLeft">
+              <views:SettingsView DataContext="{Binding Settings}"/>
+            </Flyout>
+          </Button.Flyout>
+        </Button>
+
+        <!-- Session Dropdown (replaces left pane list) -->
+        <ComboBox Grid.Column="1"
+                  ItemsSource="{CompiledBinding SessionList.Sessions}"
+                  SelectedItem="{CompiledBinding SessionList.SelectedSession}"
+                  HorizontalAlignment="Stretch"
+                  MaxDropDownHeight="400"
+                  PlaceholderText="Select session...">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="models:Session">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0"
+                           Text="{CompiledBinding DisplayName}"
+                           TextTrimming="CharacterEllipsis"
+                           MaxWidth="200"/>
+                <TextBlock Grid.Column="1"
+                           Text="{CompiledBinding LastActivity, Converter={x:Static conv:UnixTimestampToDisplayConverter.Instance}}"
+                           Classes="caption"
+                           Opacity="0.7"
+                           Margin="12,0,0,0"/>
+              </Grid>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <!-- Connection State Indicator (moved to top right) -->
+        <StackPanel Grid.Column="2"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    Margin="12,0,8,0"
+                    ToolTip.Tip="{CompiledBinding ConnectionStatusText}">
+          <Panel Width="10" Height="10" Margin="0,0,6,0" VerticalAlignment="Center">
+            <Ellipse Fill="{DynamicResource SuccessBrush}" IsVisible="{CompiledBinding IsConnected}"/>
+            <Ellipse Fill="{DynamicResource TextSecondaryBrush}" Opacity="0.6" IsVisible="{CompiledBinding !IsConnected}"/>
+          </Panel>
+          <TextBlock Text="{CompiledBinding ConnectionStatusText}"
+                     Classes="caption"
+                     VerticalAlignment="Center"
+                     IsVisible="{CompiledBinding IsDesktop}"/>
+        </StackPanel>
+
+        <!-- Disconnect Button -->
+        <Button Grid.Column="3"
+                Content="✕"
+                Command="{CompiledBinding DisconnectCommand}"
+                IsVisible="{CompiledBinding IsConnected}"
+                Classes="secondary icon"
+                ToolTip.Tip="Disconnect"/>
+      </Grid>
+    </Border>
+
+    <!-- Messages List with Virtualization -->
+    <ListBox Grid.Row="1"
+             x:Name="MessagesListBox"
+             ItemsSource="{CompiledBinding FilteredMessages}"
+             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+             Background="Transparent"
+             BorderThickness="0"
+             Padding="12"
+             Focusable="False"
+             DoubleTapped="OnMessageDoubleTapped">
+      <!-- Disable selection highlight (fixes click highlight flash) -->
+      <ListBox.ItemContainerTheme>
+        <ControlTheme TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+          <Style Selector="^:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+          </Style>
+        </ControlTheme>
+      </ListBox.ItemContainerTheme>
+      <!-- VirtualizingStackPanel improves performance for large chat histories -->
+      <ListBox.ItemsPanel>
+        <ItemsPanelTemplate>
+          <VirtualizingStackPanel Orientation="Vertical"
+                                  CacheLength="2"
+                                  AreVerticalSnapPointsRegular="False"/>
+        </ItemsPanelTemplate>
+      </ListBox.ItemsPanel>
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="models:ChatMessage">
+          <Border Margin="0,4">
+            <controls:ChatBubble ContentBlocks="{CompiledBinding Content}"
+                                IsFromUser="{CompiledBinding IsUser}"
+                                Role="{CompiledBinding Role}"
+                                Timestamp="{CompiledBinding Timestamp, Converter={x:Static conv:UnixTimestampToDisplayConverter.Instance}}"
+                                IsLatestMessage="{CompiledBinding IsLatestMessage}"/>
+          </Border>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+
+    <!-- Input Area (with bottom padding for mobile keyboard) -->
+    <Border Grid.Row="2"
+            x:Name="InputBorder"
+            Padding="12,12,12,0"
+            BorderThickness="0,1,0,0"
+            BorderBrush="{DynamicResource BorderBrush}"
+            Background="{DynamicResource SurfaceBrush}">
+      <StackPanel Spacing="8">
+        <!-- Pending Attachments Display -->
+        <ItemsControl ItemsSource="{CompiledBinding PendingAttachments}"
+                      IsVisible="{CompiledBinding HasPendingAttachments}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="services:PendingAttachment">
+              <Border Background="{DynamicResource SurfaceBrush}"
+                      BorderBrush="{DynamicResource BorderBrush}"
+                      BorderThickness="1"
+                      CornerRadius="6"
+                      Padding="8,4"
+                      Margin="0,0,8,4">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="📎" VerticalAlignment="Center"/>
+                  <TextBlock Text="{CompiledBinding FileName}"
+                             Classes="caption"
+                             VerticalAlignment="Center"
+                             MaxWidth="120"
+                             TextTrimming="CharacterEllipsis"/>
+                  <Button Content="✕"
+                          Classes="icon"
+                          Padding="4"
+                          Command="{Binding $parent[UserControl].((vm:ChatViewModel)DataContext).RemoveAttachmentCommand}"
+                          CommandParameter="{Binding}"
+                          ToolTip.Tip="Remove attachment"/>
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- Recording Indicator (shown when recording) -->
+        <Border IsVisible="{CompiledBinding IsRecording}"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="#E53935"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="12,8">
+          <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+            <!-- Recording indicator (pulsing red dot) -->
+            <Ellipse Grid.Column="0"
+                     Width="12" Height="12"
+                     Fill="#E53935"
+                     VerticalAlignment="Center"
+                     Margin="0,0,8,0"/>
+
+            <!-- Duration display -->
+            <TextBlock Grid.Column="1"
+                       Text="{CompiledBinding RecordingDuration, StringFormat='{}{0:mm\\:ss}'}"
+                       Classes="body"
+                       VerticalAlignment="Center"
+                       Margin="0,0,16,0"/>
+
+            <!-- Spacer -->
+            <Panel Grid.Column="2"/>
+
+            <!-- Cancel button -->
+            <Button Grid.Column="3"
+                    Content="Cancel"
+                    Command="{CompiledBinding CancelRecordingCommand}"
+                    Classes="secondary"
+                    Margin="0,0,8,0"/>
+
+            <!-- Stop and add to attachments -->
+            <Button Grid.Column="4"
+                    Content="Stop"
+                    Command="{CompiledBinding ToggleRecordingCommand}"
+                    Classes="primary"/>
+          </Grid>
+        </Border>
+
+        <!-- Input Row: [Attach] [TextBox] [Mic] [Send] (hidden when recording) -->
+        <Grid ColumnDefinitions="Auto,*,Auto,Auto"
+              IsVisible="{CompiledBinding !IsRecording}"
+              Margin="0,0,0,12">
+          <!-- Attach Button (hidden for now to save space) -->
+          <Button Grid.Column="0"
+                  Content="📎"
+                  Click="AttachButton_Click"
+                  Classes="secondary icon"
+                  ToolTip.Tip="Attach files"
+                  Margin="0,0,8,0"
+                  VerticalAlignment="Bottom"
+                  IsVisible="False"/>
+
+          <!-- Message TextBox -->
+          <TextBox Grid.Column="1"
+                   x:Name="MessageTextBox"
+                   Text="{CompiledBinding CurrentMessage}"
+                   Watermark="Type a message..."
+                   AcceptsReturn="True"
+                   TextWrapping="Wrap"
+                   MinHeight="44"
+                   MaxHeight="150"
+                   Margin="0,0,8,0"
+                   VerticalContentAlignment="Top">
+            <TextBox.KeyBindings>
+              <KeyBinding Gesture="Enter"
+                          Command="{CompiledBinding SendMessageCommand}"/>
+            </TextBox.KeyBindings>
+          </TextBox>
+
+          <!-- Mic Button (for audio recording) -->
+          <Button Grid.Column="2"
+                  x:Name="MicButton"
+                  Command="{CompiledBinding ToggleRecordingCommand}"
+                  IsEnabled="{CompiledBinding IsAudioRecordingSupported}"
+                  Classes="secondary icon"
+                  ToolTip.Tip="{CompiledBinding IsAudioRecordingSupported, Converter={x:Static conv:BoolToRecordingTooltipConverter.Instance}}"
+                  Margin="0,0,8,0"
+                  VerticalAlignment="Bottom">
+            <TextBlock Text="🎤"/>
+          </Button>
+
+          <!-- Send Button -->
+          <Button Grid.Column="3"
+                  Content="Send"
+                  Command="{CompiledBinding SendMessageCommand}"
+                  IsEnabled="{CompiledBinding !IsSending}"
+                  Classes="primary"
+                  VerticalAlignment="Bottom"/>
+        </Grid>
+      </StackPanel>
+    </Border>
+    </Grid>
+    
+    <!-- Scroll to Bottom Button (floating, bottom-right) -->
+    <Button x:Name="ScrollToBottomButton"
+            Content="↓"
+            Click="ScrollToBottomButton_Click"
+            IsVisible="{CompiledBinding IsScrollToBottomButtonVisible}"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Margin="0,0,20,90"
+            Width="48"
+            Height="48"
+            CornerRadius="24"
+            Padding="0"
+            FontSize="20"
+            FontWeight="Bold"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            Classes="primary"
+            ZIndex="100"
+            ToolTip.Tip="Scroll to bottom">
+      <Button.Styles>
+        <Style Selector="Button">
+          <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+        </Style>
+        <Style Selector="Button:pointerover">
+          <Setter Property="Opacity" Value="0.9"/>
+        </Style>
+      </Button.Styles>
+    </Button>
+    
+    <!-- Message Detail Overlay (hidden by default) -->
+    <Panel x:Name="MessageDetailOverlay"
+           IsVisible="False"
+           ZIndex="1000"/>
+  </Grid>
+</UserControl>

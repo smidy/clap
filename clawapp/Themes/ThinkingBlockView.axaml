@@ -1,0 +1,76 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:clawapp.Controls">
+    <ControlTheme x:Key="{x:Type controls:ThinkingBlockView}" TargetType="controls:ThinkingBlockView">
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="Transparent"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="0,0,0,0"
+                        Padding="0,4">
+                    <StackPanel Spacing="4">
+                        <!-- Header with toggle -->
+                        <Button x:Name="PART_ToggleButton"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                Cursor="Hand">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock x:Name="PART_Chevron"
+                                           Text="▶"
+                                           FontSize="10"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock x:Name="PART_HeaderText"
+                                           Text="Show thinking"
+                                           FontSize="12"
+                                           FontStyle="Italic"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <!-- Thinking content (collapsed by default) -->
+                        <Border x:Name="PART_ContentBorder"
+                                IsVisible="False"
+                                Background="{DynamicResource SurfaceBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="10"
+                                Margin="0,4,0,0">
+                            <SelectableTextBlock Text="{TemplateBinding ThinkingText}"
+                                                 Foreground="{TemplateBinding Foreground}"
+                                                 TextWrapping="Wrap"
+                                                 FontSize="{TemplateBinding FontSize}"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <!-- Expanded state: rotate chevron, show content -->
+        <Style Selector="^[IsExpanded=True]">
+            <Style Selector="^ /template/ TextBlock#PART_Chevron">
+                <Setter Property="Text" Value="▼"/>
+            </Style>
+            <Style Selector="^ /template/ TextBlock#PART_HeaderText">
+                <Setter Property="Text" Value="Hide thinking"/>
+            </Style>
+            <Style Selector="^ /template/ Border#PART_ContentBorder">
+                <Setter Property="IsVisible" Value="True"/>
+            </Style>
+        </Style>
+        <!-- Streaming state: show "Thinking..." indicator -->
+        <Style Selector="^[IsStreaming=True]">
+            <Style Selector="^ /template/ TextBlock#PART_HeaderText">
+                <Setter Property="Text" Value="Thinking..."/>
+                <Setter Property="FontStyle" Value="Italic"/>
+            </Style>
+            <Style Selector="^ /template/ TextBlock#PART_Chevron">
+                <Setter Property="Text" Value="⏳"/>
+            </Style>
+        </Style>
+    </ControlTheme>
+</ResourceDictionary>

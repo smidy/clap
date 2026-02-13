@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <!-- Android SDK and Java configuration -->
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' And Exists('$(HOME)/Android/Sdk')">$(HOME)/Android/Sdk</AndroidSdkDirectory>
+    <JavaSdkDirectory Condition="'$(JavaSdkDirectory)' == ''">/usr/lib/jvm/msopenjdk-11-amd64</JavaSdkDirectory>
+  </PropertyGroup>
+</Project>

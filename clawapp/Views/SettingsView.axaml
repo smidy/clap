@@ -1,0 +1,197 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:clawapp.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="280" d:DesignHeight="450"
+             x:Class="clawapp.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+  <Border Background="{DynamicResource SurfaceBrush}"
+          CornerRadius="8"
+          Padding="16"
+          MinWidth="260"
+          MaxHeight="500">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel Spacing="16">
+        <!-- Header -->
+        <TextBlock Text="Settings"
+                   Classes="h2"
+                   Margin="0,0,0,8"/>
+
+        <!-- Appearance Section -->
+        <StackPanel Spacing="12">
+          <TextBlock Text="Appearance"
+                     Classes="label"/>
+
+          <!-- Theme Toggle -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="2">
+              <TextBlock Text="Dark theme"
+                         Classes="body"/>
+              <TextBlock Text="Use dark color scheme"
+                         Classes="caption"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{CompiledBinding IsDarkTheme}"
+                          OffContent=""
+                          OnContent=""
+                          VerticalAlignment="Center"/>
+          </Grid>
+        </StackPanel>
+
+        <!-- Separator -->
+        <Border Height="1"
+                Background="{DynamicResource BorderBrush}"
+                Margin="0,4"/>
+
+        <!-- Display Settings Section -->
+        <StackPanel Spacing="12">
+          <TextBlock Text="Display"
+                     Classes="label"/>
+
+          <!-- Show Thinking Blocks -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="2">
+              <TextBlock Text="Show thinking blocks"
+                         Classes="body"/>
+              <TextBlock Text="Display AI reasoning process"
+                         Classes="caption"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{CompiledBinding ShowThinkingBlocks}"
+                          OffContent=""
+                          OnContent=""
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- Show Tool Calls -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="2">
+              <TextBlock Text="Show tool calls"
+                         Classes="body"/>
+              <TextBlock Text="Display function invocations"
+                         Classes="caption"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{CompiledBinding ShowToolCalls}"
+                          OffContent=""
+                          OnContent=""
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- Show Tool Results -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="2">
+              <TextBlock Text="Show tool results"
+                         Classes="body"/>
+              <TextBlock Text="Display tool execution results"
+                         Classes="caption"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{CompiledBinding ShowToolResults}"
+                          OffContent=""
+                          OnContent=""
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- Show Streaming Messages -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="2">
+              <TextBlock Text="Show streaming messages"
+                         Classes="body"/>
+              <TextBlock Text="Live-update message content as it arrives"
+                         Classes="caption"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{CompiledBinding ShowStreamingMessages}"
+                          OffContent=""
+                          OnContent=""
+                          VerticalAlignment="Center"/>
+          </Grid>
+        </StackPanel>
+
+        <!-- Separator -->
+        <Border Height="1"
+                Background="{DynamicResource BorderBrush}"
+                Margin="0,4"/>
+
+        <!-- Media Settings Section -->
+        <StackPanel Spacing="12">
+          <TextBlock Text="Media"
+                     Classes="label"/>
+
+          <!-- Auto-play Audio -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="2">
+              <TextBlock Text="Auto-play audio"
+                         Classes="body"/>
+              <TextBlock Text="Automatically play audio messages"
+                         Classes="caption"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{CompiledBinding AutoPlayAudio}"
+                          OffContent=""
+                          OnContent=""
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- Auto-download Attachments -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="2">
+              <TextBlock Text="Auto-download attachments"
+                         Classes="body"/>
+              <TextBlock Text="Download files automatically"
+                         Classes="caption"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{CompiledBinding AutoDownloadAttachments}"
+                          OffContent=""
+                          OnContent=""
+                          VerticalAlignment="Center"/>
+          </Grid>
+        </StackPanel>
+
+        <!-- Separator -->
+        <Border Height="1"
+                Background="{DynamicResource BorderBrush}"
+                Margin="0,4"/>
+
+        <!-- Notification Settings Section -->
+        <StackPanel Spacing="12">
+          <TextBlock Text="Notifications"
+                     Classes="label"/>
+
+          <!-- Notification Sounds -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="2">
+              <TextBlock Text="Notification sounds"
+                         Classes="body"/>
+              <TextBlock Text="Play sound for new messages"
+                         Classes="caption"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{CompiledBinding NotificationSoundsEnabled}"
+                          OffContent=""
+                          OnContent=""
+                          VerticalAlignment="Center"/>
+          </Grid>
+
+          <!-- Notification Vibration -->
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="2">
+              <TextBlock Text="Vibration"
+                         Classes="body"/>
+              <TextBlock Text="Vibrate for new messages"
+                         Classes="caption"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1"
+                          IsChecked="{CompiledBinding NotificationVibrationEnabled}"
+                          OffContent=""
+                          OnContent=""
+                          VerticalAlignment="Center"/>
+          </Grid>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+  </Border>
+</UserControl>

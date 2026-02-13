@@ -1,0 +1,115 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:clawapp.Controls"
+                    xmlns:conv="using:clawapp.Converters">
+    <ControlTheme x:Key="{x:Type controls:ChatBubble}" TargetType="controls:ChatBubble">
+        <Setter Property="Background" Value="{DynamicResource AssistantBubbleBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="MaxWidth" Value="600"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}"
+                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                        MaxWidth="{TemplateBinding MaxWidth}">
+                    <StackPanel>
+                        <TextBlock Text="{TemplateBinding Role}"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   FontWeight="SemiBold"
+                                   FontSize="11"
+                                   Opacity="0.8"/>
+                        <!-- Content area: use ContentBlocks if available, fall back to Message -->
+                        <!-- Height-limited for non-latest messages to reduce scroll jumps -->
+                        <Grid>
+                            <Border x:Name="PART_ContentContainer"
+                                    ClipToBounds="True">
+                                <StackPanel x:Name="PART_ContentStackPanel">
+                                    <ItemsControl x:Name="PART_ContentPresenter"
+                                                  ItemsSource="{TemplateBinding ContentBlocks}"
+                                                  ItemTemplate="{StaticResource ContentBlockTemplateSelector}"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Spacing="8" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                    <!-- Fallback for legacy Message binding (shown when ContentBlocks is null/empty) -->
+                                    <TextBlock x:Name="PART_LegacyMessage"
+                                               Text="{TemplateBinding Message}"
+                                               Foreground="{TemplateBinding Foreground}"
+                                               TextWrapping="Wrap"
+                                               IsVisible="False"/>
+                                </StackPanel>
+                            </Border>
+                            <!-- Fade overlay and "View full message" hint for truncated messages -->
+                            <Border x:Name="PART_TruncationIndicator"
+                                    VerticalAlignment="Bottom"
+                                    Height="60"
+                                    IsVisible="False">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                        <GradientStop Color="Transparent" Offset="0"/>
+                                        <GradientStop Color="#CC000000" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <TextBlock Text="📄 Double-click to view full message"
+                                           Foreground="White"
+                                           FontSize="11"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Bottom"
+                                           Margin="0,0,0,8"/>
+                            </Border>
+                        </Grid>
+                        <TextBlock Text="{TemplateBinding Timestamp}"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   FontSize="11"
+                                   Opacity="0.7"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <!-- Height limiting for non-latest messages (reduces scroll jumps from variable heights) -->
+        <Style Selector="^[IsLatestMessage=False] /template/ Border#PART_ContentContainer">
+            <Setter Property="MaxHeight" Value="300"/>
+        </Style>
+        <Style Selector="^[IsLatestMessage=True] /template/ Border#PART_ContentContainer">
+            <Setter Property="MaxHeight" Value="NaN"/>
+        </Style>
+        <!-- Show truncation indicator only for non-latest messages that are actually truncated -->
+        <Style Selector="^[IsLatestMessage=False][IsTruncated=True] /template/ Border#PART_TruncationIndicator">
+            <Setter Property="IsVisible" Value="True"/>
+        </Style>
+        <Style Selector="^[IsLatestMessage=True] /template/ Border#PART_TruncationIndicator">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="^[IsTruncated=False] /template/ Border#PART_TruncationIndicator">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <!-- User (sent) message: right-aligned, accent background -->
+        <Style Selector="^[IsFromUser=True]">
+            <Setter Property="Background" Value="{DynamicResource UserBubbleBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+        </Style>
+        <!-- Assistant (received) message: left-aligned, surface background -->
+        <Style Selector="^[IsFromUser=False]">
+            <Setter Property="Background" Value="{DynamicResource AssistantBubbleBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+        <!-- Subtle opacity transition for smooth state changes -->
+        <Style Selector="^">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                </Transitions>
+            </Setter>
+        </Style>
+    </ControlTheme>
+</ResourceDictionary>

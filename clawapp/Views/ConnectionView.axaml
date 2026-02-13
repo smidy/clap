@@ -1,0 +1,93 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:clawapp.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="420" d:DesignHeight="480"
+             x:Class="clawapp.Views.ConnectionView"
+             x:DataType="vm:ConnectionViewModel">
+  <Grid RowDefinitions="*,Auto,*">
+    <Border Grid.Row="1"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="12"
+            Padding="32"
+            MaxWidth="420"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            BoxShadow="0 4 20 0 #20000000">
+      <StackPanel Spacing="20">
+        <TextBlock Text="ClawApp"
+                   Classes="h1"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,8"/>
+        <TextBlock Text="Connect to OpenClaw Gateway"
+                   Classes="body"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,8"/>
+
+        <!-- Host -->
+        <TextBox Watermark="Host (e.g. 127.0.0.1 or myhost.tailnet.ts.net)"
+                 Text="{CompiledBinding GatewayHost}"
+                 Classes="body"/>
+
+        <!-- Port -->
+        <TextBox Watermark="Port (e.g. 18789)"
+                 Text="{CompiledBinding GatewayPort}"
+                 Classes="body"/>
+
+        <!-- Secure WebSocket Toggle (for Tailscale serve HTTPS) -->
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Grid.Column="0" Spacing="2">
+            <TextBlock Text="Use secure WebSocket (wss://)"
+                       Classes="body"/>
+            <TextBlock Text="Enable for Tailscale serve HTTPS endpoints"
+                       Classes="caption"
+                       Opacity="0.7"/>
+          </StackPanel>
+          <ToggleSwitch Grid.Column="1"
+                        IsChecked="{CompiledBinding UseSecureWebSocket}"
+                        OffContent=""
+                        OnContent=""
+                        VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- Token -->
+        <TextBox Watermark="Token (optional)"
+                 Text="{CompiledBinding GatewayToken}"
+                 PasswordChar="*"
+                 Classes="body"/>
+
+        <Border IsVisible="{CompiledBinding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource ErrorBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="12">
+          <TextBlock Text="{CompiledBinding ErrorMessage}"
+                     Foreground="{DynamicResource ErrorBrush}"
+                     TextWrapping="Wrap"
+                     FontSize="13"/>
+        </Border>
+        <Border IsVisible="{CompiledBinding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Padding="0,4">
+          <StackPanel Spacing="8">
+            <ProgressBar IsIndeterminate="True"
+                         IsVisible="{CompiledBinding IsConnecting}"
+                         Height="4"/>
+            <TextBlock Text="{CompiledBinding StatusMessage}"
+                       Foreground="{DynamicResource AccentBrush}"
+                       FontSize="13"/>
+          </StackPanel>
+        </Border>
+        <Button Content="Connect"
+                Command="{CompiledBinding ConnectCommand}"
+                IsEnabled="{CompiledBinding !IsConnecting}"
+                HorizontalAlignment="Stretch"
+                Classes="primary"/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>
